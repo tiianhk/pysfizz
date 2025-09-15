@@ -1,0 +1,6 @@
+[submodule "external/sfizz"]
+	path = external/sfizz
+	url = https://github.com/michaelknoch/sfizz.git
+[submodule "external/nanobind"]
+	path = external/nanobind
+	url = https://github.com/wjakob/nanobind.git
