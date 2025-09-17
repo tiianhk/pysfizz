@@ -103,7 +103,12 @@ public:
         // Positive values: higher keys = higher pitch
         // Negative values: higher keys = lower pitch (rare)
         regionData["pitch_keytrack"] = nb::float_(region->pitchKeytrack);
-        
+    
+        // Random pitch variation - adds natural pitch variation to each note (default: 0)
+        // Range: 0-12000 cents (0 = no variation, 100 = 1 semitone variation)
+        // Creates human-like pitch variation for more natural sound
+        regionData["pitch_random"] = nb::float_(region->pitchRandom);
+
         // Pitch tracking per velocity - how much pitch changes with velocity (default: 0)
         // Positive values: higher velocity = higher pitch
         // Negative values: higher velocity = lower pitch
@@ -119,9 +124,13 @@ public:
         // Used for fine-tuning the sample's pitch
         regionData["tune"] = nb::float_(region->pitch);
         
-        // PITCH CALCULATION RELATIONSHIP:
-        // Final pitch = base_pitch + (note_number - pitch_keycenter) * pitch_keytrack + 
-        //                velocity * pitch_veltrack + transpose * 100 + tune
+        // PITCH CALCULATION RELATIONSHIP (in cents):
+        // pitchVariationInCents = pitch_keytrack * (noteNumber - pitch_keycenter)  // note difference
+        //                       + tune                                             // sample tuning (regionData['tune'])
+        //                       + 100 * transpose                                  // transpose opcode (regionData['transpose'])
+        //                       + velocity * pitch_veltrack                        // velocity tracking (regionData['pitch_veltrack'])
+        //                       + random(0, pitch_random)                          // random pitch variation (regionData['pitch_random'])
+        // Where: noteNumber = MIDI note pressed (0-127)
         
         // ============================================================================
         // SUSTAIN PEDAL INFORMATION
@@ -160,17 +169,9 @@ public:
         }
         regionData["loop_mode"] = nb::str(loopModeStr.c_str());
         
-        // Sample position where loop begins (in samples)
-        // Range: 0 to sample_length
-        regionData["loop_start"] = nb::int_(region->loopRange.getStart());
-        
-        // Sample position where loop ends (in samples)
-        // Range: loop_start to sample_length
-        regionData["loop_end"] = nb::int_(region->loopRange.getEnd());
-        
         // LOOP MODE BEHAVIORS:
-        // - "no_loop": Sample plays once from start to end, then stops
-        // - "one_shot": Same as no_loop (explicitly marked one-shot)
+        // - "no_loop": Sample plays from start to end OR until note-off, whichever comes first
+        // - "one_shot": Sample plays from start to end, completely ignoring note-off events (common for drums)
         // - "loop_continuous": Sample loops continuously from loop_start to loop_end
         // - "loop_sustain": Sample loops only while key is held down
         
@@ -198,12 +199,40 @@ public:
         
         return regionData;
     }
+
+    // Get all region indices that respond to a specific MIDI note
+    std::vector<int> getRegionsForNote(int midiNote) const {
+        std::vector<int> regionIndices;
+        
+        auto* synth_handle = synth_.handle();
+        if (!synth_handle) {
+            throw nb::value_error("No SFZ file loaded. Call load_sfz_file() first.");
+        }
+        
+        // Bounds checking
+        if (midiNote < 0 || midiNote > 127) {
+            std::string errorMsg = "MIDI note " + std::to_string(midiNote) + 
+                                 " out of range. Valid range: 0 to 127";
+            throw nb::value_error(errorMsg.c_str());
+        }
+        
+        int numRegions = synth_handle->synth.getNumRegions();
+        for (int i = 0; i < numRegions; i++) {
+            const auto* region = synth_handle->synth.getRegionView(i);
+            if (region && region->keyRange.containsWithEnd(midiNote)) {
+                regionIndices.push_back(i);
+            }
+        }
+        
+        return regionIndices;
+    }
 };
 
-NB_MODULE(pysfizz_1, m) {
+NB_MODULE(pysfizz, m) {
     nb::class_<Parser>(m, "Parser")
         .def(nb::init<>())
         .def("load_sfz_file", &Parser::loadSfzFile)
         .def("get_num_regions", &Parser::getNumRegions)
-        .def("get_region_data", &Parser::getRegionData);
+        .def("get_region_data", &Parser::getRegionData)
+        .def("get_regions_for_note", &Parser::getRegionsForNote);
 }
