@@ -19,11 +19,5 @@ cmake --build build --config Release --parallel
 ```
 3.  Test the Python module:
 ```bash
-# On Linux/macOS with Unix Makefiles generator:
-cd build/
-# On Windows with Visual Studio generator and Release as build type:
-cd build/Release/
-
-# Run a quick test:
 python -c "import pysfizz; print('pysfizz imported successfully!')"
 ```

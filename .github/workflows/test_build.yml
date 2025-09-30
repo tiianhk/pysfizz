@@ -91,15 +91,7 @@ jobs:
     - name: Test Python Import
       shell: bash
       run: |
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          cd "build/${{ matrix.build_type }}"
-        else
-          cd build
-        fi
-        which python
-        python --version
-        echo "Files in current directory:"
-        ls -la
+        ls -la pysfizz
         python -c "
         import pysfizz
         parser = pysfizz.Parser()

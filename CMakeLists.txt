@@ -20,3 +20,10 @@ target_include_directories(_sfizz PRIVATE
     ${CMAKE_SOURCE_DIR}/external/sfizz/external/simde/
     ${CMAKE_SOURCE_DIR}/external/sfizz/external/filesystem/include/
 )
+
+add_custom_command(TARGET _sfizz POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+        $<TARGET_FILE:_sfizz>
+        ${CMAKE_SOURCE_DIR}/pysfizz/
+    COMMENT "Copying _sfizz module to pysfizz/ directory"
+)
