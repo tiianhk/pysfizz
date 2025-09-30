@@ -1,1 +1,2 @@
-from ._sfizz import *
+from . import _sfizz
+from .parser import Parser

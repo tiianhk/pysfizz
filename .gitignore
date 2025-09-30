@@ -45,3 +45,6 @@ build/
 test_output/
 *.wav
 *.flac
+
+# Custom
+test.py
