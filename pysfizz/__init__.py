@@ -1,1 +1,1 @@
-from .pysfizz import *
+from ._sfizz import *

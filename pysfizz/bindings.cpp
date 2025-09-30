@@ -228,7 +228,7 @@ public:
     }
 };
 
-NB_MODULE(pysfizz, m) {
+NB_MODULE(_sfizz, m) {
     nb::class_<Parser>(m, "Parser")
         .def(nb::init<>())
         .def("load_sfz_file", &Parser::loadSfzFile)

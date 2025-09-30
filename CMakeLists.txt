@@ -12,10 +12,10 @@ add_subdirectory(external/sfizz)
 set(SFIZZ_SHARED OFF CACHE BOOL "Disable shared library")
 
 # Create Python extension
-nanobind_add_module(pysfizz pysfizz/bindings.cpp)
-target_link_libraries(pysfizz PRIVATE sfizz::static)
+nanobind_add_module(_sfizz pysfizz/bindings.cpp)
+target_link_libraries(_sfizz PRIVATE sfizz::static)
 
-target_include_directories(pysfizz PRIVATE 
+target_include_directories(_sfizz PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/external/sfizz/external/abseil-cpp
     ${CMAKE_SOURCE_DIR}/external/sfizz/external/simde/
     ${CMAKE_SOURCE_DIR}/external/sfizz/external/filesystem/include/
