@@ -463,6 +463,11 @@ public:
         return synth_handle_->synth.getNumVoices();
     }
 
+    // Get number of active voices (currently playing or in release phase).
+    int getNumActiveVoices() const {
+        return synth_handle_->synth.getNumActiveVoices();
+    }
+
     // === OFFLINE ACCELERATION METHODS ===
 
     // Check if freewheeling is enabled
@@ -527,7 +532,7 @@ NB_MODULE(_sfizz, m) {
     // Bind the unified Synth class
     nb::class_<Synth>(m, "Synth")
         // Constructor
-        .def(nb::init<int, int>())
+        .def(nb::init<int, int>(), nb::arg("sample_rate") = 48000, nb::arg("block_size") = 1024)
         
         // Parser methods
         .def("load_sfz_file", &Synth::loadSfzFile)
@@ -553,6 +558,8 @@ NB_MODULE(_sfizz, m) {
 
         .def("get_num_voices", &Synth::getNumVoices)
         .def("set_num_voices", &Synth::setNumVoices)
+
+        .def("get_num_active_voices", &Synth::getNumActiveVoices)
 
         // Offline acceleration methods
         .def("is_freewheeling", &Synth::isFreeWheeling)
