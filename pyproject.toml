@@ -26,6 +26,7 @@ manylinux-aarch64-image = "manylinux2014"
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "arm64"]
+environment = { MACOSX_DEPLOYMENT_TARGET = "10.13" }
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]

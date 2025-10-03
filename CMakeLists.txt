@@ -4,11 +4,17 @@ project(pysfizz LANGUAGES CXX C)
 # Find Python
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
+# Use /MD runtime on Windows for Python compatibility
+if(MSVC)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "MSVC runtime library")
+endif()
+
 # Add subdirectories for dependencies
 add_subdirectory(external/nanobind)
 add_subdirectory(external/sfizz)
 
 # Configure sfizz for minimal build
+set(SFIZZ_JACK OFF CACHE BOOL "Disable JACK support")
 set(SFIZZ_SHARED OFF CACHE BOOL "Disable shared library")
 
 # Create Python extension
