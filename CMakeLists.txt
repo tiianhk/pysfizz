@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 project(pysfizz LANGUAGES CXX C)
 
 # Find Python
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
 # Add subdirectories for dependencies
 add_subdirectory(external/nanobind)
