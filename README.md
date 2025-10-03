@@ -1,8 +1,8 @@
 ## Build from Source
 
 ### Prerequisites
-- Python 3.8 or higher with development headers
-- CMake 3.12 or higher
+- Python 3.9 or higher with development headers
+- CMake 3.15 or higher
 - C++17 compatible compiler
 
 ### Build Steps
