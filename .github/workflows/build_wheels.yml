@@ -12,7 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        os: [windows-latest]
+        # os: [ubuntu-latest, windows-latest, macos-13, macos-14]
         # macos-13: macOS Intel (x86_64)
         # macos-14: macOS Apple Silicon (arm64)
 
@@ -31,34 +32,34 @@ jobs:
           name: wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
-  build_sdist:
-    name: Build source distribution
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+  # build_sdist:
+  #   name: Build source distribution
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
 
-      - name: Build sdist
-        run: pipx run build --sdist
+  #     - name: Build sdist
+  #       run: pipx run build --sdist
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sdist
-          path: dist/*.tar.gz
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: sdist
+  #         path: dist/*.tar.gz
 
-  upload_pypi:
-    needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
-    permissions:
-      id-token: write
+  # upload_pypi:
+  #   needs: [build_wheels, build_sdist]
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'release' && github.event.action == 'published'
+  #   permissions:
+  #     id-token: write
     
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: "*"
-          path: dist
-          merge-multiple: true
+  #   steps:
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: "*"
+  #         path: dist
+  #         merge-multiple: true
 
-      - uses: pypa/gh-action-pypi-publish@release/v1
+  #     - uses: pypa/gh-action-pypi-publish@release/v1
