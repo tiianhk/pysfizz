@@ -1,16 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-
-# Enable CMAKE_MSVC_RUNTIME_LIBRARY
-if(POLICY CMP0091)
-  cmake_policy(SET CMP0091 NEW)
-endif()
-
 project(pysfizz LANGUAGES CXX C)
-
-# Use /MD runtime on Windows for Python compatibility
-if(MSVC)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "MSVC runtime library")
-endif()
 
 # Find Python
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
@@ -23,6 +12,9 @@ set(WAVPACK_ENABLE_ASM OFF CACHE BOOL "Disable WavPack assembly")
 set(SFIZZ_JACK OFF CACHE BOOL "Disable JACK support")
 set(SFIZZ_SHARED OFF CACHE BOOL "Disable shared library")
 add_subdirectory(external/sfizz)
+set_target_properties(sfizz_static sfizz_internal PROPERTIES
+  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+)
 
 # Create Python extension
 nanobind_add_module(_sfizz pysfizz/bindings.cpp)
