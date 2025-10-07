@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pysfizz"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python bindings for sfizz"
 authors = [{ name = "Haokun Tian", email = "tianhaokun258@gmail.com" }]
 license = { file = "LICENSE" }
