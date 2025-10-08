@@ -1,4 +1,4 @@
-name: Test Release (TestPyPI)
+name: Build Wheels and Upload to TestPyPI
 
 on:
   workflow_dispatch:
