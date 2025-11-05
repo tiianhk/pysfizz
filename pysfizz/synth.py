@@ -79,7 +79,7 @@ class Synth:
             left.append(left_block)
             right.append(right_block)
             nsamples_current += block_size
-        nblocks_silent = (nsamples_render - nsamples_current) // block_size
+        nblocks_silent = 1 + max(0, (nsamples_render - nsamples_current) // block_size)
         for _ in range(nblocks_silent):
             left_block, right_block = self._synth.render_block()
             left.append(left_block)
@@ -88,4 +88,4 @@ class Synth:
             np.concatenate(left),
             np.concatenate(right)
         ])
-        return rendered_audio
+        return rendered_audio[:, :nsamples_render]
