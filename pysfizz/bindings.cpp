@@ -410,6 +410,12 @@ public:
         auto right = nb::ndarray<nb::numpy, float>(rightBuffer_.data(), {rightBuffer_.size()});
         return nb::make_tuple(left, right);
     }
+
+    // Clear all voices and reset audio state
+    // Based on sfizz Synth.cpp allSoundOff() method
+    void allSoundOff() {
+        synth_handle_->synth.allSoundOff();
+    }
     
     // === SYNTH CONFIGURATIONS ===
 
@@ -548,6 +554,7 @@ NB_MODULE(_sfizz, m) {
         
         // Audio rendering
         .def("render_block", &Synth::renderBlock)
+        .def("all_sound_off", &Synth::allSoundOff)
         
         // Configuration methods
         .def("get_sample_rate", &Synth::getSampleRate)
