@@ -89,3 +89,33 @@ class Synth:
             np.concatenate(right)
         ])
         return rendered_audio[:, :nsamples_render]
+
+    def get_note_info(self, midi_note):
+        if self.path is None:
+            raise ValueError("No SFZ file loaded")
+        region_indices = self._synth.get_regions_for_note(midi_note)
+        results = []
+        for idx in region_indices:
+            region_data = self._synth.get_region_data(idx)
+            pitch_keycenter = region_data['pitch_keycenter']
+            pitch_keytrack = region_data['pitch_keytrack']
+            tune = region_data['tune']
+            transpose = region_data['transpose']
+            pitch_veltrack = region_data['pitch_veltrack']
+            pitch_random = region_data['pitch_random']
+            lovel = round(region_data['lovel'] * 127)
+            hivel = round(region_data['hivel'] * 127)
+            pitch_shift_cents = pitch_keytrack * (midi_note - pitch_keycenter) + tune + 100 * transpose
+            pitch_shift_semitones = pitch_shift_cents / 100.0
+            results.append({
+                'pitch_shift_semitones': pitch_shift_semitones,
+                'pitch_keycenter': pitch_keycenter,
+                'pitch_keytrack': pitch_keytrack,
+                'tune': tune,
+                'transpose': transpose,
+                'pitch_veltrack': pitch_veltrack,
+                'pitch_random': pitch_random,
+                'lovel': lovel,
+                'hivel': hivel,
+            })
+        return results

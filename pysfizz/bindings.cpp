@@ -104,12 +104,12 @@ public:
         // VELOCITY MAPPING (MIDI Velocity: 0-127)
         // ============================================================================
         
-        // Lowest velocity value that triggers this region (default: 0)
-        // Range: 0.0-127.0 (normalized MIDI velocity)
+        // Lowest velocity value that triggers this region (default: 0.0)
+        // Range: 0.0-1.0 (normalized MIDI velocity, 1.0 = MIDI velocity 127)
         region_data["lovel"] = nb::float_(region->velocityRange.getStart());
         
-        // Highest velocity value that triggers this region (default: 127)
-        // Range: 0.0-127.0 (normalized MIDI velocity)
+        // Highest velocity value that triggers this region (default: 1.0)
+        // Range: 0.0-1.0 (normalized MIDI velocity, 1.0 = MIDI velocity 127)
         region_data["hivel"] = nb::float_(region->velocityRange.getEnd());
         
         // ============================================================================
