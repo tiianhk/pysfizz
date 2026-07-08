@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pysfizz"
-version = "0.1.3.dev1"
+version = "0.1.3"
 description = "Python bindings for sfizz"
 authors = [{ name = "Haokun Tian", email = "tianhaokun258@gmail.com" }]
 license = "BSD-2-Clause"
@@ -40,7 +40,7 @@ cmake.build-type = "Release"
 
 [tool.cibuildwheel]
 build = ["cp39-*", "cp310-*", "cp311-*", "cp312-*", "cp313-*", "cp314-*"]
-skip = ["*-musllinux*", "pp*"]
+skip = ["*-musllinux*"]
 
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux2014"

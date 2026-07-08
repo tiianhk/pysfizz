@@ -3,7 +3,7 @@ Python bindings for [sfizz](https://github.com/sfztools/sfizz), a sample-based s
 
 ## Installation
 ### From PyPI
-Prebuilt wheels are available for Python 3.9–3.13 on Linux, macOS, and Windows.
+Prebuilt wheels are available for Python 3.9–3.14 on Linux, macOS, and Windows.
 ```bash
 pip install pysfizz
 ```
