@@ -97,6 +97,7 @@ class Synth:
         results = []
         for idx in region_indices:
             region_data = self._synth.get_region_data(idx)
+            sample_id = region_data['sample_id']
             pitch_keycenter = region_data['pitch_keycenter']
             pitch_keytrack = region_data['pitch_keytrack']
             tune = region_data['tune']
@@ -108,6 +109,7 @@ class Synth:
             pitch_shift_cents = pitch_keytrack * (midi_note - pitch_keycenter) + tune + 100 * transpose
             pitch_shift_semitones = pitch_shift_cents / 100.0
             results.append({
+                'sample_id': sample_id,
                 'pitch_shift_semitones': pitch_shift_semitones,
                 'pitch_keycenter': pitch_keycenter,
                 'pitch_keytrack': pitch_keytrack,
