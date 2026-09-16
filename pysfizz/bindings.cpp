@@ -187,6 +187,11 @@ public:
                 case sfz::LoopMode::one_shot: loopModeStr = "one_shot"; break;
                 case sfz::LoopMode::loop_continuous: loopModeStr = "loop_continuous"; break;
                 case sfz::LoopMode::loop_sustain: loopModeStr = "loop_sustain"; break;
+                default:
+                    loopModeStr = "unknown("
+                        + std::to_string(static_cast<int>(region->loopMode.value()))
+                        + ")";
+                    break;
             }
         } else {
             loopModeStr = "no_loop"; // Default when not specified (from Defaults.cpp line 210)
