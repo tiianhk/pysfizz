@@ -31,11 +31,12 @@ endif()
 set(WAVPACK_ENABLE_ASM OFF CACHE BOOL "Disable WavPack assembly")
 set(SFIZZ_JACK OFF CACHE BOOL "Disable JACK support")
 set(SFIZZ_SHARED OFF CACHE BOOL "Disable shared library")
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard to be used" FORCE)
 add_subdirectory(external/sfizz)
 
 # Create Python extension
 nanobind_add_module(_sfizz pysfizz/bindings.cpp)
-target_link_libraries(_sfizz PRIVATE sfizz::static)
+target_link_libraries(_sfizz PRIVATE sfizz::static sfizz::parser)
 
 target_include_directories(_sfizz PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/external/sfizz/external/abseil-cpp

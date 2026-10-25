@@ -4,6 +4,7 @@
 #include <nanobind/stl/map.h>
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/tuple.h>
+#include <nanobind/stl/pair.h>
 #include <nanobind/ndarray.h>
 #include <sfizz.hpp>
 #include <sfizz/Synth.h>
@@ -11,8 +12,58 @@
 #include <sfizz/Defaults.h>
 #include <sfizz/sfizz_private.hpp>
 #include <sfizz/SynthConfig.h>
+#include <sfizz/Opcode.h>
+#include <sfizz/parser/Parser.h>
+#include <sfizz/parser/ParserListener.h>
 
 namespace nb = nanobind;
+
+// === SFZ SOURCE PARSING ===
+
+using OpcodeList = std::vector<std::pair<std::string, std::string>>;
+using BlockList = std::vector<std::pair<std::string, OpcodeList>>;
+
+static sfz::OpcodeScope headerScope(const std::string& header)
+{
+    if (header == "region") return sfz::kOpcodeScopeRegion;
+    if (header == "group") return sfz::kOpcodeScopeGroup;
+    if (header == "master") return sfz::kOpcodeScopeMaster;
+    if (header == "global") return sfz::kOpcodeScopeGlobal;
+    if (header == "control") return sfz::kOpcodeScopeControl;
+    if (header == "effect") return sfz::kOpcodeScopeEffect;
+    return sfz::kOpcodeScopeGeneric;
+}
+
+// Collects every block the parser completes, in file order
+class OpcodeCollector : public sfz::ParserListener {
+public:
+    BlockList blocks;
+
+    void onParseFullBlock(const std::string& header,
+                          const std::vector<sfz::Opcode>& opcodes) override
+    {
+        const sfz::OpcodeScope scope = headerScope(header);
+        OpcodeList members;
+        members.reserve(opcodes.size());
+        for (const sfz::Opcode& rawOpcode : opcodes) {
+            const sfz::Opcode opcode = rawOpcode.cleanUp(scope);
+            members.emplace_back(opcode.name, opcode.value);
+        }
+        blocks.emplace_back(header, std::move(members));
+    }
+};
+
+// Read a file without loading it into a synth, as (blocks, errors, warnings)
+static std::tuple<BlockList, size_t, size_t> parseSfz(const std::string& path)
+{
+    OpcodeCollector collector;
+    sfz::Parser parser;
+    parser.setListener(&collector);
+    parser.setRecursiveIncludeGuardEnabled(true);
+    parser.parseFile(path);
+    return { std::move(collector.blocks),
+             parser.getErrorCount(), parser.getWarningCount() };
+}
 
 class Synth {
 private:
@@ -583,4 +634,7 @@ NB_MODULE(_sfizz, m) {
 
         .def("set_sample_quality", &Synth::setSampleQuality)
         .def("set_oscillator_quality", &Synth::setOscillatorQuality);
+
+    // Source level access, independent of any loaded synth
+    m.def("parse_sfz", &parseSfz, nb::arg("path"));
 }

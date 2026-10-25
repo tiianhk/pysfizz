@@ -20,12 +20,30 @@ def suppress_stderr():
         os.dup2(original_stderr_fd, stderr_fd)
         os.close(original_stderr_fd)
 
+def region_opcodes(path):
+    blocks, _errors, _warnings = _sfizz.parse_sfz(str(path))
+    in_global, in_master, in_group = {}, {}, {}
+    regions = []
+    for header, opcodes in blocks:
+        members = dict(opcodes)
+        if header == "global":
+            in_global, in_master, in_group = members, {}, {}
+        elif header == "master":
+            in_master, in_group = members, {}
+        elif header == "group":
+            in_group = members
+        elif header == "region":
+            regions.append({**in_global, **in_master, **in_group, **members})
+    return regions
+
+
 class Synth:
     def __init__(self, sample_rate=48000, block_size=1024):
         self._synth = _sfizz.Synth(sample_rate, block_size)
         self._synth.enable_freewheeling()
         self.path = None
         self.playable_keys = []
+        self.region_opcodes = []
         # expose _sfizz.Synth methods
         self.get_sample_rate = self._synth.get_sample_rate
         self.set_sample_rate = self._synth.set_sample_rate
@@ -46,10 +64,12 @@ class Synth:
             success = self._synth.load_sfz_file(path)
         if success and self._synth.get_num_regions() > 0:
             self.path = path
+            self.region_opcodes = region_opcodes(path)
             self.update_playable_keys()
             return True
         else:
             self.path = None
+            self.region_opcodes = []
             return False
 
     def update_playable_keys(self):
@@ -119,5 +139,7 @@ class Synth:
                 'pitch_random': pitch_random,
                 'lovel': lovel,
                 'hivel': hivel,
+                'opcodes': self.region_opcodes[region_data['id']]
+                if region_data['id'] < len(self.region_opcodes) else None,
             })
         return results
